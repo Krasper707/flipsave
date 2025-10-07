@@ -34,6 +34,14 @@ class ExtractedInfo(BaseModel):
 
 load_dotenv()
 
+def get_llm():
+    """Initializes and returns the shared Gemini LLM model."""
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        temperature=0,
+        convert_system_message_to_human=True
+    )
+    return llm
 
 def create_extraction_chain():
     """
@@ -41,7 +49,7 @@ def create_extraction_chain():
     This version includes a retry mechanism for robustness.
     """
     
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0, convert_system_message_to_human=True)
+    llm = get_llm()
     
     parser = PydanticOutputParser(pydantic_object=ExtractedInfo)
     

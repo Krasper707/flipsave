@@ -17,6 +17,7 @@ This project was built as a portfolio piece to demonstrate skills required for t
 - **Intelligent LLM Transformation:** Uses Gemini to perform complex entity extraction (vendor, amount, offers, codes) and classification (category).
 - **Structured Data Output:** Produces a clean, analysis-ready CSV file with valuable, structured offer information.
 - **Modular and Professional Code:** Well-structured Python code with clear separation of concerns (Extract, Transform, Orchestrate).
+- **AI-Powered Reporting:** Features an "AI Analyst" that generates natural language summaries and insights from the processed data.
 
 ## 🛠️ Tech Stack
 
@@ -91,7 +92,7 @@ You can then access the interactive documentation at `http://127.0.0.1:8000/docs
 
 ## 📊 Interactive Analysis Dashboard
 
-This project includes a live, interactive dashboard built with Streamlit to visualize and explore the processed data.
+This project includes a live, interactive dashboard built with Streamlit to visualize and explore the processed data. The dashboard also includes an **AI Analyst** feature that generates a written summary of the key trends in the data with the click of a button.
 
 ### How to Run the Dashboard
 

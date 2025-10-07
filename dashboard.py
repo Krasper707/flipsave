@@ -3,7 +3,13 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from src.llm_extractor import get_llm 
 
+from src.llm_extractor import create_extraction_chain
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+
+import json
 st.set_page_config(
     page_title="FlipSave Analysis Dashboard",
     page_icon="📊",
@@ -21,6 +27,69 @@ def load_data():
     except FileNotFoundError:
         return None
 
+@st.cache_data
+def generate_ai_summary(_df):
+    """
+    Generates a natural language summary of the dataframe using the LLM from the existing extraction chain.
+    
+    Args:
+        _df (pd.DataFrame): The dataframe to analyze.
+        
+    Returns:
+        str: The AI-generated summary.
+    """
+    if _df.empty:
+        return "No data available to generate a summary."
+
+    # 1. Pre-process the data to get key statistics
+    offer_df = _df[_df['transaction_type'] == 'Offer'].copy()
+    if offer_df.empty:
+        return "No 'Offer' type data found to generate a summary."
+
+    total_offers = len(offer_df)
+    unique_vendors = offer_df['vendor'].nunique()
+    top_5_vendors = offer_df['vendor'].value_counts().nlargest(5).to_dict()
+    top_3_categories = offer_df['category'].value_counts().nlargest(3).to_dict()
+
+    stats_summary = f"""
+    - Total Offers Analyzed: {total_offers}
+    - Unique Vendors Found: {unique_vendors}
+    - Top 5 Vendors by Offer Volume: {json.dumps(top_5_vendors)}
+    - Top 3 Categories by Offer Volume: {json.dumps(top_3_categories)}
+    """
+
+    try:
+        llm = get_llm()
+    except Exception as e:
+        return f"Failed to initialize the language model. Error: {e}"
+    
+    # 3. Create a specific LLM chain for reporting
+    prompt_template = ChatPromptTemplate.from_template(
+        """
+        You are a sharp and concise financial data analyst. Your task is to write a brief executive summary based on the following statistics extracted from a dataset of recent financial offers.
+
+        **Key Statistics:**
+        {stats}
+
+        **Your Report:**
+        Based on the data, write a short, insightful summary (3-4 sentences).
+        - Start with a clear opening statement about the dataset.
+        - Highlight the most dominant vendor or trend.
+        - Mention the most common categories.
+        - Conclude with a brief closing thought.
+        - Use a professional and analytical tone. Do not just list the stats; interpret them.
+        """
+    )
+    
+    reporting_chain = prompt_template | llm | StrOutputParser()
+
+    # 4. Invoke the chain to get the report
+    try:
+        report = reporting_chain.invoke({"stats": stats_summary})
+        return report
+    except Exception as e:
+        return f"An error occurred while generating the report: {e}"
+
 df = load_data()
 
 st.title("FlipSave: AI Data Pipeline Analysis")
@@ -32,6 +101,16 @@ st.sidebar.markdown("Use the filters below to explore the dataset.")
 if df is None:
     st.error("Data not found. Please run the main pipeline first by executing `python run_pipeline.py`.")
 else:
+    st.subheader("🤖 AI-Generated Executive Summary")
+    if st.button("Generate Report"):
+        with st.spinner("AI Analyst at work... Analyzing trends..."):
+            # We will generate a summary based on the full, unfiltered dataset
+            summary_report = generate_ai_summary(df)
+            st.success("Analysis Complete!")
+            st.markdown(summary_report)
+    
+    st.markdown("---")
+
     # --- Sidebar Filters ---
     all_vendors = sorted(df['vendor'].dropna().unique())
     selected_vendors = st.sidebar.multiselect(
