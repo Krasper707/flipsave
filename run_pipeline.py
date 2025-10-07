@@ -2,8 +2,8 @@
 import os
 import json
 
-from api_client import fetch_news_data
-from process_api_data import transform_raw_data
+from src.api_client import fetch_news_data
+from src.process_api_data import transform_raw_data
 
 RAW_DATA_PATH = 'data/raw_api_data.json'
 

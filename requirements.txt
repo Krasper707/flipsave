@@ -6,3 +6,5 @@ uvicorn
 python-dotenv 
 pydantic
 requests
+beautifulsoup4 
+streamlit

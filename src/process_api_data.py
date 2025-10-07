@@ -3,14 +3,14 @@
 import json
 import pandas as pd
 import time
-from llm_extractor import create_extraction_chain
+from .llm_extractor import create_extraction_chain
 
 # --- Configuration ---
 INPUT_FILE = 'data/raw_api_data.json'
 OUTPUT_FILE = 'data/processed_offers_from_api.csv'
 # --- NEW: Add a variable to control how many items to process ---
 # Set to None to process all items, or a number to process just the top N.
-NUM_ITEMS_TO_PROCESS = 5 
+NUM_ITEMS_TO_PROCESS = 10
 
 def transform_raw_data():
     """

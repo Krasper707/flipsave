@@ -1,20 +1,22 @@
-# FlipSave - AI Financial Text Processor
+# FlipSave - AI Financial Data Pipeline
 
-An intelligent API to extract and categorize information from unstructured financial text messages using Google Gemini.
+An end-to-end data pipeline that extracts real-world offer data from the internet, transforms it into structured information using Google Gemini, and makes it available for financial applications.
 
 ## 🚀 Overview
 
-FlipSave is an intelligent API designed to automate the extraction and categorization of financial information from unstructured text messages, such as bank alerts and promotional offers. This project leverages the power of **Google's Gemini Pro** model via **Langchain** to transform messy text data into clean, structured JSON, making it ready for downstream financial applications.
+FlipSave has evolved from a simple API into a complete, automated ETL (Extract, Transform, Load) data pipeline. This project demonstrates a full-stack AI workflow, from proactive data gathering to intelligent processing and storage.
 
-This project was built as a portfolio piece to demonstrate skills required for the **AI Intern role at Paybyflip**, focusing on LLMs, Data Processing, and API development.
+The pipeline uses the **NewsAPI** to extract real-time articles about discounts and sales. This unstructured text is then fed into a sophisticated model powered by **Google's Gemini Pro** and **Langchain**, which transforms it into clean, categorized, and structured JSON. The final, valuable data is saved to a CSV, ready for analysis or application use.
+
+This project was built as a portfolio piece to demonstrate skills required for the **AI Intern role at Paybyflip**, showcasing expertise in **Data Pipelines, API Integration, LLMs, and Automation.**
 
 ## ✨ Key Features
 
-- **Intelligent Entity Extraction:** Parses text to identify key entities like vendor, amount, offer details, and coupon codes.
-- **Automated Categorization:** Assigns a relevant category (e.g., "Food & Dining", "Shopping") to each transaction or offer.
-- **Robust API:** A production-ready REST API built with **FastAPI**, complete with automatic data validation and interactive documentation.
-- **Resilient Logic:** The core extraction chain includes an automatic retry mechanism to handle transient API failures.
-- **Bulk Testing:** Includes a test script to validate API performance against a sample CSV dataset.
+- **Automated Data Pipeline:** A complete, runnable ETL workflow that gathers and processes data with a single command (`run_pipeline.py`).
+- **API-Driven Data Extraction:** Robustly fetches real-world data from the NewsAPI, demonstrating professional third-party API integration.
+- **Intelligent LLM Transformation:** Uses Gemini to perform complex entity extraction (vendor, amount, offers, codes) and classification (category).
+- **Structured Data Output:** Produces a clean, analysis-ready CSV file with valuable, structured offer information.
+- **Modular and Professional Code:** Well-structured Python code with clear separation of concerns (Extract, Transform, Orchestrate).
 
 ## 🛠️ Tech Stack
 
@@ -22,11 +24,12 @@ This project was built as a portfolio piece to demonstrate skills required for t
 - **AI/ML:**
   - **LLM:** Google Gemini 1.5 Pro
   - **Framework:** Langchain (`langchain`, `langchain-google-genai`)
-- **API:** FastAPI, Uvicorn
-- **Data Handling:** Pydantic, Pandas
-- **Testing:** Requests
+- **Data Pipeline:**
+  - **Extraction:** Requests, NewsAPI
+  - **Transformation & Load:** Pandas, Pydantic
+- **Original API Component:** FastAPI, Uvicorn
 
-## ⚙️ Setup and Installation
+## ⚙️ How to Run the Data Pipeline
 
 ### 1. Clone the Repository
 
@@ -55,47 +58,46 @@ pip install -r requirements.txt
 
 ### 4. Configure Environment Variables
 
-Create a `.env` file in the root of the project of the form
+Create a `.env` file and add your unique API keys.
 
-```bash
-GOOGLE_API_KEY="your-google-api-key-goes-here"
+```env
+GOOGLE_API_KEY="your-google-api-key"
+NEWS_API_KEY="your-news-api-key"
 ```
 
-### 5. Run the API Server
+### 5. Run the Entire Pipeline
+
+Execute the master orchestrator script. This will run all steps: fetching from the API, processing with the LLM, and saving the final CSV.
+
+```bash
+python run_pipeline.py
+```
+
+Upon completion, you will find the final structured data in `data/processed_offers_from_api.csv`.
+
+---
+
+## 🔬 Original API Server (For Testing Core Logic)
+
+This project also includes the original FastAPI server used for development and single-text testing.
+
+**To Run the Server:**
 
 ```bash
 uvicorn src.main:app --reload
 ```
 
-The server will be running at `http://127.0.0.1:8000`.
+You can then access the interactive documentation at `http://127.0.0.1:8000/docs` to test individual text strings.
 
-## 📚 API Usage
+## 📊 Interactive Analysis Dashboard
 
-### Interactive Documentation
+This project includes a live, interactive dashboard built with Streamlit to visualize and explore the processed data.
 
-Once the server is running, access the interactive Swagger UI documentation at **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)** to test the endpoint live.
+### How to Run the Dashboard
 
-### Testing with the CSV file
-
-To run the bulk test script against the `sample_data.csv`:
-
-1. Keep the API server running in one terminal.
-2. In a second terminal (with the venv activated), run:
+1. Ensure you have run the data pipeline at least once to generate the `processed_offers_from_api.csv` file.
+2. In your terminal, run the following command:
 
 ```bash
-python test_api.py
+streamlit run dashboard.py
 ```
-
-### Example `curl` Request
-
-```bash
-curl -X 'POST' \
-  'http://127.0.0.1:8000/process-text/' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "text": "Get 50% off on your Myntra order of Rs. 1500. Use code SAVEBIG. Valid till 31st Dec."
-}'
-```
-
----
